@@ -4,6 +4,13 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
+    theme: {
+    extend: {
+      fontFamily: {
+         sans: ['Poppins', 'sans-serif'],
+      },
+    },
+  },
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.js'],

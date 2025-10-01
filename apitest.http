@@ -1,0 +1,59 @@
+################################ REST Client untuk API Testing #####################################
+### Endpoint API yang digunakan adalah https://rbac.test/api
+### Gunakan REST Client di VSCode untuk menjalankan file ini
+
+### Endpoint PING
+GET https://rbacpro.test/api/ping
+Accept: application/json
+
+### Login ke aplikasi
+POST https://rbacpro.test/api/login
+Content-Type: application/json
+
+{
+  "email": "jaya@mail.com",
+  "password": "passdeff"
+}
+
+### Logout
+POST https://rbacpro.test/api/logout
+Content-Type: application/json
+Authorization: Bearer 2|cwAxCUzlPJYs0nawglShRmd6Hj9CzvFDSyTYw4gn65557f32
+
+
+
+### GET data profile user
+GET https://rbacpro.test/api/profile
+Accept: application/json
+Authorization: Bearer 3|bnG5xPkHsuoODLGFrOPyMcsnrqhRzO39ZwO1RM5X0c0f16e7
+
+
+###
+
+### POST data baru (simulasi kirim data)
+POST https://rbacpro.test/api
+Content-Type: application/json
+
+{
+  "title": "Belajar REST Client",
+  "body": "Ini isi body-nya",
+  "userId": 1
+}
+
+###
+
+### PUT untuk update data
+PUT https://rbacpro.test/api/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "title": "Judul diperbarui",
+  "body": "Isi diperbarui",
+  "userId": 1
+}
+
+###
+
+### DELETE data
+DELETE https://rbacpro.test/api/1

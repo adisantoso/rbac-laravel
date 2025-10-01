@@ -13,6 +13,10 @@ class AuthController extends Controller
         return Inertia::render('Auth/Login');
     }
 
+    public function showForgotPassword()
+    {
+        return Inertia::render('Auth/ForgotPassword');
+    }
     public function login(Request $request)
     {
         try {

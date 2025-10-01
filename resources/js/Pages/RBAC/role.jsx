@@ -65,27 +65,97 @@ export default function RolePage({ roles, modules }) {
   return (
     <HomeLayout>
       <div className="grid gap-6">
-        {/* Kolom Kiri - CRUD Role */}
-        <div className="flex flex-col item-center bg-white shadow p-4 rounded-lg">
-          <h1 className="text-2xl font-bold mb-4">Roles & Access</h1>
-          {/* Form tambah/edit */}
-          <form onSubmit={handleSubmit} className="mb-4 flex gap-2">
-            <input
-              type="text"
-              placeholder="Role Name"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="border px-3 py-2 rounded w-full"
-            />
-            <input
-              type="text"
-              placeholder="Role Description"
-              required
-              value={desc}
-              onChange={(e) => setDesc(e.target.value)}
-              className="border px-3 py-2 rounded w-full"
-            />
+  {/* Kolom Kiri - CRUD Role */}
+  <div className="flex flex-col bg-white shadow p-4 rounded-lg">
+    <h1 className="text-2xl font-bold mb-4">Roles & Access</h1>
+
+    {/* Grid 2 kolom: Table kiri, Form kanan */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      {/* List Role & Module Access */}
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse border">
+          <thead className="bg-gray-200">
+            <tr>
+              <th className="border px-4 py-2">Roles</th>
+              <th className="border px-4 py-2">Module Access</th>
+              <th className="border px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {roles.map((role) => (
+              <tr key={role.id}>
+                <td className="border px-4 py-2 align-top">
+                  <span className="font-semibold">
+                    <UserIcon className="h-5 w-5 inline-block mr-1" /> {role.name}
+                  </span>
+                  <br />
+                  <i className="text-gray-500 text-sm">
+                    Description : {role.desc}
+                  </i>
+                </td>
+                <td className="border px-4 py-2 align-top">
+                  <button
+                    onClick={() => handleOpenModal(role)}
+                    className="bg-blue-500 text-white px-2 py-1 rounded cursor-pointer hover:bg-gray-600 mb-2"
+                  >
+                    <CogIcon className="h-5 w-5 inline-block" />
+                  </button>
+                  <ul>
+                    {role.modules && role.modules.length > 0 ? (
+                      role.modules.map((module) => (
+                        <li key={module.id}>
+                          <CheckIcon className="h-5 w-5 inline-block mr-1 text-green-500" />{" "}
+                          {module.name}
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-gray-400 italic">Belum ada modul</li>
+                    )}
+                  </ul>
+                </td>
+                <td className="border px-4 py-2 text-center">
+                  <div className="flex justify-center space-x-2">
+                    <button
+                      onClick={() => handleEdit(role)}
+                      className="bg-yellow-500 text-white px-2 py-1 rounded cursor-pointer hover:bg-gray-600"
+                    >
+                      <PencilAltIcon className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(role.id)}
+                      className="bg-red-500 text-white px-2 py-1 rounded cursor-pointer hover:bg-gray-600"
+                    >
+                      <TrashIcon className="h-5 w-5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Form tambah/edit */}
+      <div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <input
+            type="text"
+            placeholder="Role Name"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="border px-3 py-2 rounded w-full"
+          />
+          <input
+            type="text"
+            placeholder="Role Description"
+            required
+            value={desc}
+            onChange={(e) => setDesc(e.target.value)}
+            className="border px-3 py-2 rounded w-full"
+          />
+          <div className="flex gap-2">
             <button
               type="submit"
               className="bg-gray-500 text-white px-4 py-2 rounded"
@@ -100,66 +170,19 @@ export default function RolePage({ roles, modules }) {
                   setName("");
                   setDesc("");
                 }}
-                className="bg-gray-500 text-white px-4 py-2 rounded"
+                className="bg-gray-400 text-white px-4 py-2 rounded"
               >
                 Batal
               </button>
             )}
-          </form>
-
-          {/* List Role & Module Access */}
-          <table>
-            <thead className="bg-gray-200 border">
-              <tr>
-                <th className="border px-4 py-2">Roles</th>
-                <th className="border px-4 py-2">Module Access</th>
-                <th className="border px-4 py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {roles.map((role) => (
-                <tr key={role.id}>
-                  <td className="border px-4 py-2">
-                    <span className="font-semibold"><UserIcon className="h-5 w-5 inline-block mr-1" /> {role.name}</span> <br />
-                    <i className="text-gray-500 text-sm">Description : {role.desc}</i>
-                    </td>
-                  <td className="border px-4 py-2">
-                    <ul>
-                      {role.modules && role.modules.length > 0 ? (
-                        role.modules.map((module) => (
-                          <li key={module.id}> <CheckIcon className="h-5 w-5 inline-block mr-1 text-green-500" /> {module.name}</li>
-                        ))
-                      ) : (
-                        <li className="text-gray-400 italic">Belum ada modul</li>
-                      )}
-                    </ul>
-                  </td>
-                  <td className="border align-middle justify-center px-4 py-2 space-x-2">
-                    <button
-                      onClick={() => handleEdit(role)}
-                      className="bg-yellow-500 text-white px-1 py-1 rounded cursor-pointer hover:bg-gray-600"
-                    >
-                      <PencilAltIcon className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(role.id)}
-                      className="bg-red-500 text-white px-1 py-1 rounded cursor-pointer hover:bg-gray-600"
-                    >
-                      <TrashIcon className="h-5 w-5" />
-                    </button>
-                                      <button
-                    onClick={() => handleOpenModal(role)}
-                    className="bg-blue-500 text-white px-1 py-1 rounded cursor-pointer hover:bg-gray-600"
-                  >
-                    <CogIcon className="h-5 w-5" />
-                  </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+          </div>
+        </form>
       </div>
+
+    </div>
+  </div>
+</div>
+
 
       {/* Modal Add Modul Access */}
       {showModal && (

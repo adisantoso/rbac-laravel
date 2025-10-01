@@ -24,7 +24,7 @@ export default function MenuModal({ isOpen, onClose }) {
         </button>
 
         {/* Judul */}
-        <h2 className="text-lg font-bold mb-6 border-b pb-2">MODULES</h2>
+        <h2 className="text-lg font-bold mb-6 border-b pb-2 text-gray-800">MODULES</h2>
 
         {/* Row Modul */}
         <div className="flex flex-wrap gap-4 mb-4 justify-center">
@@ -48,7 +48,7 @@ export default function MenuModal({ isOpen, onClose }) {
         
         {/* Menu Aktif - Horizontal */}
         <h2 className="text-lg font-bold mb-4 justify-center">
-          <span>Menu {activeModData?.name} :</span>
+          <span className="text-gray-800">Menu {activeModData?.name} :</span>
         </h2>
         {activeModData && (
           <div className="bg-blue-100 rounded-lg p-5 transition-all duration-300">

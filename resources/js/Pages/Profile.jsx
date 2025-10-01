@@ -5,7 +5,9 @@ import HomeLayout from "../Layouts/HomeLayout";
 export default function Profile({ user }) {
   const [modalPin, setModalPin] = useState(false);
   const [pin, setPin] = useState(["", "", "", "", "", ""]);
+  const [password, setPassword] = useState("");
   const inputsRef = useRef([]);
+  const [formUpdatePassword, setFormUpdatePassword] = useState(false);
 
   const handleChange = (e, index) => {
     const value = e.target.value.replace(/\D/, ""); // hanya angka
@@ -44,6 +46,8 @@ export default function Profile({ user }) {
 
   const resetForm = () => {
     setPin(["", "", "", "", "", ""]);
+    setPassword("");
+    inputsRef.current[0].focus();
   };
 
   const handleSubmit = (e) => {
@@ -53,6 +57,7 @@ export default function Profile({ user }) {
 
     const formData = new FormData();
     formData.append("pin", pinValue);
+    formData.append("password", password);
 
     router.post("profile-updatePin", formData, {
       onSuccess: () => {
@@ -84,15 +89,15 @@ export default function Profile({ user }) {
         <div className="mb-4 space-y-2 bg-gray-100 p-4 rounded shadow">
           <h2 className="font-sm italic">Account Informations :</h2>
           <div className="flex justify-between">
-            <h2 className="font-semibold">Name :</h2>
+            <h2 className="font-semibold">Name </h2>
             <p className="font-semibold">{user.name}</p>
           </div>
           <div className="flex justify-between">
-            <h2 className="font-semibold">Email :</h2>
+            <h2 className="font-semibold">Email </h2>
             <p className="font-semibold">{user.email}</p>
           </div>
           <div className="flex justify-between">
-            <h2 className="font-semibold">Role :</h2>
+            <h2 className="font-semibold">Role </h2>
             <p className="font-semibold">
               {user.roles.map((role) => role.name).join(", ")}
             </p>
@@ -106,11 +111,60 @@ export default function Profile({ user }) {
             >
               {user?.pin ? "Change PIN" : "Set PIN"}
             </button>
-            <button className="text-white px-4 py-2 hover:underline bg-red-300 hover:bg-red-500 rounded cursor-pointer">
+            <button className="text-white px-4 py-2 hover:underline bg-red-300 hover:bg-red-500 rounded cursor-pointer"
+            onClick={() => setFormUpdatePassword(true)}
+            >
               Change Password
             </button>
           </div>
         </div>
+        
+        {formUpdatePassword && (
+          <div className="mb-4 space-y-2 bg-gray-100 p-4 rounded shadow">
+            <h2 className="font-sm italic">Change Password :</h2>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault(); 
+                const formData = new FormData(e.target);
+                router.post("profile-updatePassword", formData, {
+                  onSuccess: () => setFormUpdatePassword(false),
+                });
+              }}>
+                <div className="flex flex-col space-y-2">
+              <input
+                type="password"
+                name="current_password"
+                placeholder="Current Password"
+                className="border border-gray-300 rounded p-2" required
+              />
+              <input
+                type="password"
+                name="new_password"
+                placeholder="New Password"
+                className="border border-gray-300 rounded p-2" required
+              />
+              <input
+                type="password"
+                name="new_password_confirmation"
+                placeholder="Confirm New Password"
+                className="border border-gray-300 rounded p-2" required
+              />
+            </div>
+            <div className="flex justify-end space-x-2 mt-2">
+              <button
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                onClick={() => setFormUpdatePassword(false)}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600">
+                Save
+              </button>
+            </div>
+              </form>
+            
+          </div>
+        )}
       </div>
 
       {modalPin && (
@@ -145,6 +199,14 @@ export default function Profile({ user }) {
                     className="w-12 h-12 text-center border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-200 text-lg"
                   />
                 ))}
+                </div>
+                <div className="flex-1">
+                  <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full h-10 text-center border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-200 text-lg" placeholder="Enter your password"
+                />
               </div>
 
               <div className="flex justify-end space-x-2">

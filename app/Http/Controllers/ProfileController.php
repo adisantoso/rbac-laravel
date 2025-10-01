@@ -30,8 +30,14 @@ class ProfileController extends Controller
         try {
             $request->validate([
                 'pin' => 'required|numeric|digits:6',
+                'password' => 'required|string',
             ]);
-                
+            
+            // Verify password
+            if (!Hash::check($request->password, Auth::user()->password)) {
+                return redirect()->back()->with('error', 'Password is incorrect.');
+            }
+            // Update PIN
             $user = Auth::user();
             $user->pin = Hash::make($request->pin);
             $user->save();
@@ -40,6 +46,30 @@ class ProfileController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'PIN Update Failed: ' . $e->getMessage());
         }   
+    }
+
+    public function updatePassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'new_password' => 'required|string|min:8|confirmed',
+                'current_password' => 'required|string',
+            ]);
+
+            // Verify current password
+            if (!Hash::check($request->current_password, Auth::user()->password)) {
+                return redirect()->back()->with('error', 'Current password is incorrect.');
+            }
+
+            // Update Password
+            $user = Auth::user();
+            $user->password = Hash::make($request->new_password);
+            $user->save();
+            return redirect()->back()->with('success', 'Password updated successfully.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Password Update Failed: ' . $e->getMessage());
+        }
     }
 
         /**

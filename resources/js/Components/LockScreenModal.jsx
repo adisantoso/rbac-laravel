@@ -42,7 +42,7 @@ export default function LockScreenModal({ onUnlock, errorMsg  }) {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-md z-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-md z-51">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
         <h2 className="text-xl font-bold mb-4">🔒 Locked</h2>
         <p className="mb-4">Masukkan PIN untuk membuka layar</p>

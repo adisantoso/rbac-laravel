@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, HasApiTokens, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -58,11 +59,19 @@ class User extends Authenticatable
     {
         return $this->roles()->where('name', $roleName)->exists();
     }
-    public function hasModule($module): bool
-    {
-        // contoh jika user punya kolom 'modules' berupa JSON
-        $modules = $this->modules ? json_decode($this->modules, true) : [];
 
-        return in_array($module, $modules);
+    public function modules()
+    {
+        return $this->roles()
+            ->with('modules')
+            ->get()
+            ->pluck('modules')
+            ->flatten()
+            ->unique('id');
+    }
+    
+    public function hasModule(string $module): bool
+    {
+        return $this->modules()->where('name', $module)->isNotEmpty();
     }
 }
