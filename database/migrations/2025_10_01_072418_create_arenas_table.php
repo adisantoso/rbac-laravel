@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
+        Schema::create('arenas', function (Blueprint $table) {
             $table->id();
-             $table->string('name')->unique();
-             $table->string('desc')->nullable();
+            $table->foreignId('type_arena_id')->constrained()->onDelete('cascade');
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->string('price')->nullable();
+            $table->string('status')->nullable();
             $table->timestamps();
         });
     }
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::dropIfExists('arenas');
     }
 };

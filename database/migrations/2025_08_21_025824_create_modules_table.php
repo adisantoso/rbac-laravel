@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('icon')->nullable(); // opsional untuk UI
             $table->string('style')->nullable(); // opsional, untuk path menu
+            $table->string('desc')->nullable(); // opsional, untuk path menu
             $table->timestamps();
         });
     }
