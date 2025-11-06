@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('pin')->nullable();
+            $table->boolean('lock_screen_enabled')->default(false);
             $table->string('web_token')->nullable();
             $table->string('mobile_token')->nullable();
             $table->string('last_activity')->nullable();

@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
 
         // Buat Module RBAC Management
         $module = Module::firstOrCreate(
-            ['name' => 'RBAC Management'],
+            ['name' => 'RBAC'],
             ['desc' => 'RBAC Management', 'created_at' => now(), 'updated_at' => now()]
         );
 

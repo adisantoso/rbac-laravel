@@ -74,4 +74,9 @@ class User extends Authenticatable
     {
         return $this->modules()->where('name', $module)->isNotEmpty();
     }
+
+    public function todos()
+    {
+        return $this->hasMany(\App\Models\Todo::class);
+    }
 }

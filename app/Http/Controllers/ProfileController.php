@@ -72,6 +72,30 @@ class ProfileController extends Controller
         }
     }
 
+    public function updateLockScreen(Request $request)
+    {
+        try {
+            $request->validate([
+                'lock_screen_enabled' => 'required|boolean',
+            ]);
+
+            $user = Auth::user();
+            $user->lock_screen_enabled = $request->lock_screen_enabled;
+            $user->save();
+
+            if ($request->lock_screen_enabled) {
+                $user->last_activity = now();
+                $user->save();
+            } else {
+                $user->last_activity = null; // Hapus timestamp jika fitur dinonaktifkan
+                $user->save();
+            }
+            return redirect()->back()->with('success', 'Lock screen setting updated.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update setting: ' . $e->getMessage());
+        }
+    }
+
         /**
      * Update the last activity timestamp.
      */

@@ -31,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
                         'email' => Auth::user()->email,
                         'pin' => Auth::user()->pin,
                         'last_activity' => Auth::user()->last_activity,
+                        'lock_screen_enabled' => Auth::user()->lock_screen_enabled,
                     ] : null,
                 ];
             },

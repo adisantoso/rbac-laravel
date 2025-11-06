@@ -1,74 +1,17 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { router } from "@inertiajs/react";
 import HomeLayout from "../Layouts/HomeLayout"; 
+import PinModal from "../Components/PinModal"; // 1. Import komponen baru
 
 export default function Profile({ user }) {
   const [modalPin, setModalPin] = useState(false);
-  const [pin, setPin] = useState(["", "", "", "", "", ""]);
-  const [password, setPassword] = useState("");
-  const inputsRef = useRef([]);
   const [formUpdatePassword, setFormUpdatePassword] = useState(false);
-
-  const handleChange = (e, index) => {
-    const value = e.target.value.replace(/\D/, ""); // hanya angka
-    if (!value) return;
-
-    const newPin = [...pin];
-    newPin[index] = value.slice(-1); // hanya ambil 1 digit
-    setPin(newPin);
-
-    // otomatis lompat ke input berikutnya
-    if (index < 5) {
-      inputsRef.current[index + 1].focus();
-    }
-  };
-
-  const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace") {
-      e.preventDefault(); // cegah default
-
-      const newPin = [...pin];
-
-      if (pin[index]) {
-        // hapus angka di kotak saat ini
-        newPin[index] = "";
-        setPin(newPin);
-      } else if (index > 0) {
-        // kalau kosong, pindah ke kotak sebelumnya
-        inputsRef.current[index - 1].focus();
-
-        // hapus angka di kotak sebelumnya juga
-        newPin[index - 1] = "";
-        setPin(newPin);
-      }
-    }
-  };
-
-  const resetForm = () => {
-    setPin(["", "", "", "", "", ""]);
-    setPassword("");
-    inputsRef.current[0].focus();
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const pinValue = pin.join("");
-    if (pinValue.length < 6) return alert("PIN harus 6 digit!");
-
-    const formData = new FormData();
-    formData.append("pin", pinValue);
-    formData.append("password", password);
-
-    router.post("profile-updatePin", formData, {
-      onSuccess: () => {
-        setModalPin(false);
-        resetForm();
-      },
-    });
-  };
 
   return (
     <HomeLayout>
+      {/* 2. Gunakan PinModal dan kontrol visibilitasnya dengan state */}
+      <PinModal isOpen={modalPin} onClose={() => setModalPin(false)} user={user} />
+
       <div className="bg-white shadow p-6 rounded-lg max-w-xl mx-auto">
       <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-center">User Profile</h1>
@@ -118,6 +61,27 @@ export default function Profile({ user }) {
             </button>
           </div>
         </div>
+        {/* Lock Sceeen Setting */}
+        <div className="flex justify-between items-center mt-2 p-4 bg-gray-100 rounded shadow">
+          <h3 className="font-semibold">🔐 Lock Screen Feature</h3>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              className="sr-only peer"
+              checked={user.lock_screen_enabled}
+              onChange={(e) => {
+                router.post('profile-updateLockScreen', {
+                  lock_screen_enabled: e.target.checked
+                }, {
+                  preserveScroll: true,
+                });
+              }}
+              disabled={!user.pin} // Nonaktifkan jika user belum set PIN
+            />
+            <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+            <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">{user.lock_screen_enabled ? 'Enabled' : 'Disabled'}</span>
+          </label>
+        </div>
         
         {formUpdatePassword && (
           <div className="mb-4 space-y-2 bg-gray-100 p-4 rounded shadow">
@@ -160,77 +124,11 @@ export default function Profile({ user }) {
               <button type="submit" className="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600">
                 Save
               </button>
-            </div>
+              </div>
               </form>
-            
           </div>
         )}
       </div>
-
-      {modalPin && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96 relative">
-            <button
-              type="button"
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-              onClick={() => {
-                setModalPin(false);
-                resetForm();
-              }}
-            >
-              ✕
-            </button>
-
-            <h2 className="text-lg font-semibold mb-4">
-              {user?.pin ? "Change PIN" : "Set PIN"}
-            </h2>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="flex justify-between">
-                {pin.map((digit, index) => (
-                  <input
-                    key={index}
-                    type="numeric"
-                    maxLength="1"
-                    value={digit}
-                    onChange={(e) => handleChange(e, index)}
-                    onKeyDown={(e) => handleKeyDown(e, index)}
-                    ref={(el) => (inputsRef.current[index] = el)}
-                    className="w-12 h-12 text-center border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-200 text-lg"
-                  />
-                ))}
-                </div>
-                <div className="flex-1">
-                  <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full h-10 text-center border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-200 text-lg" placeholder="Enter your password"
-                />
-              </div>
-
-              <div className="flex justify-end space-x-2">
-                <button
-                  type="button"
-                  className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
-                  onClick={() => {
-                    setModalPin(false);
-                    resetForm();
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
-                >
-                  Save
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </HomeLayout>
   );
 }

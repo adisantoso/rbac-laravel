@@ -1,15 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import {
-  BellIcon,
-  MailIcon,
-  MoonIcon,
-  SunIcon,
-  UserIcon,
-} from "@heroicons/react/outline";
-import { usePage, router, Link } from "@inertiajs/react";
+import { usePage, router } from "@inertiajs/react";
 
 import FlashMessage from "../Components/FlashMessage";
-import SideBar from "../Components/SideBar";
+import Time from "../Components/Time";
+import Header from "../Components/Header";
+import Logo from "../Components/Logo";
 import LockScreenModal from "../Components/LockScreenModal";
 
 export default function HomeLayout({ children }) {
@@ -20,26 +15,7 @@ export default function HomeLayout({ children }) {
   const { auth } = usePage().props;
   const user = auth.user;
 
-    // ✅ ambil state darkMode dari localStorage atau prefers-color-scheme
-  const [darkMode, setDarkMode] = useState(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      return savedTheme === "dark";
-    }
-    // fallback: cek preferensi sistem
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
-  });
 
-  // ✅ apply ke <html> dan simpan ke localStorage
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [darkMode]);
 
   
   // 🔒 Reset idle timer
@@ -74,8 +50,14 @@ export default function HomeLayout({ children }) {
 
   // 🔒 Setup idle lock
   useEffect(() => {
-    if (!user?.pin) {
-      console.log("⛔ Idle lock disabled: user tidak punya PIN");
+    // 1. Cek utama: Apakah fitur lock screen diaktifkan oleh pengguna?
+    if (!user?.lock_screen_enabled) {
+      console.log("⛔ Idle lock disabled: Feature is turned off by user.");
+      return; // Hentikan eksekusi jika fitur tidak aktif
+    }
+
+    if (!user?.pin) { // 2. Cek kedua: Apakah pengguna sudah punya PIN?
+      console.log("⛔ Idle lock disabled: User does not have a PIN.");
       return;
     }
 
@@ -92,7 +74,7 @@ export default function HomeLayout({ children }) {
       clearTimeout(idleTimer.current);
       events.forEach((e) => window.removeEventListener(e, resetIdleTimer));
     };
-  }, [user?.pin, user?.last_activity]);
+  }, [user?.pin, user?.last_activity, user?.lock_screen_enabled]); // Tambahkan user.lock_screen_enabled ke dependency array
 
 
 
@@ -111,7 +93,7 @@ export default function HomeLayout({ children }) {
         },
         onError: () => {
           console.log("❌ PIN salah");
-          setErrorMsg("PIN salah, coba lagi!");
+          setErrorMsg("Wrong PIN. Please try again.");
         },
       }
     );
@@ -120,42 +102,30 @@ export default function HomeLayout({ children }) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Modal Lock Screen */}
-      {locked && <LockScreenModal onUnlock={handleUnlock} errorMsg={errorMsg} />}
-
+      {locked && <LockScreenModal onUnlock={handleUnlock} errorMsg={errorMsg} user={user} />}
+      {/* LOGO */}
+      <Logo />
       {/* HEADER */}
-      <header className="fixed top-1 right-0 z-50 bg-yellow-600/80 text-white p-2 flex items-center space-x-4 shadow-md rounded-l-full">
-      <button className="p-1 rounded hover:bg-gray-700 cursor-pointer">
-        <BellIcon className="h-5 w-5" />
-      </button>
-      <button className="p-1 rounded hover:bg-gray-700 cursor-pointer">
-        <MailIcon className="h-5 w-5" />
-      </button>
-      <button
-        onClick={() => setDarkMode(!darkMode)}
-        className="p-1 rounded hover:bg-gray-700 cursor-pointer"
-      >
-        {darkMode ? (
-          <MoonIcon className="h-5 w-5" />
-        ) : (
-          <SunIcon className="h-5 w-5" />
-        )}
-      </button>
-      <Link href="/profile">
-      <button className="p-1 rounded hover:bg-gray-700 cursor-pointer">
-        <UserIcon className="h-5 w-5" />
-      </button>
-      </Link>
-    </header>
+      <Header />
+      {/* TIME */}
+      <Time />
       {/* BODY */}
       <div className="flex flex-1 h-0 relative">
-        <SideBar />
         <div className="flex flex-col flex-1">
-          <main className="flex-1 overflow-y-auto p-6 bg-gray-200 dark:bg-gray-800 ml-16">
+          <main className="flex-1 overflow-y-auto p-6 bg-gray-200 dark:bg-gray-800">
             <FlashMessage />
-            <div className="mt-8">
+            <div className="mt-12">
             {children}
             </div>
           </main>
+          {/* Countdown Popup Centered */}
+            {!locked && idleCountdown !== null && (
+              <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                              bg-red-700/80 text-white text-sm px-4 py-4 rounded-lg shadow-lg transition-opacity duration-300">
+                🔐Screen locked for {idleCountdown} seconds.
+              </div>
+            )}
+          {/* FOOTER */}
           <footer className="bg-gray-300 dark:bg-gray-900 text-gray-800 p-4 text-end text-sm dark:text-white">
             © 2025 SuperCode. All rights reserved.
           </footer>

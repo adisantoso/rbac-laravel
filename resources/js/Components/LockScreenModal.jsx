@@ -1,9 +1,11 @@
 // resources/js/Components/LockScreenModal.jsx
 import { useState, useRef } from "react";
+import PinModal from "./PinModal"; // 1. Import PinModal
 
-export default function LockScreenModal({ onUnlock, errorMsg  }) {
+export default function LockScreenModal({ onUnlock, errorMsg, user }) {
   const [pin, setPin] = useState(["", "", "", "", "", ""]);
   const inputsRef = useRef([]);
+  const [showForgotPinModal, setShowForgotPinModal] = useState(false); // 2. State untuk modal lupa PIN
 
   const handleChange = (e, index) => {
     const value = e.target.value.replace(/\D/, "");
@@ -36,16 +38,19 @@ export default function LockScreenModal({ onUnlock, errorMsg  }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const pinValue = pin.join("");
-    if (pinValue.length < 6) return alert("PIN harus 6 digit!");
+    if (pinValue.length < 6) return alert("TYPE 6 DIGIT PIN!");
 
     onUnlock(pinValue);
   };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-md z-51">
+      {/* 3. Render PinModal jika state-nya true */}
+      <PinModal isOpen={showForgotPinModal} onClose={() => setShowForgotPinModal(false)} user={user} />
+
       <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
-        <h2 className="text-xl font-bold mb-4">🔒 Locked</h2>
-        <p className="mb-4">Masukkan PIN untuk membuka layar</p>
+        <h2 className="text-xl font-bold mb-4">🔒 SCREEN LOCKED</h2>
+        <p className="mb-4">Type your PIN to unlock the screen.</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex justify-between mb-4">
@@ -67,9 +72,20 @@ export default function LockScreenModal({ onUnlock, errorMsg  }) {
             type="submit"
             className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
           >
-            🔑 Unlock
+            🔑 UNLOCK
           </button>
         </form>
+          <br />
+          {/* forgot pin */}
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => setShowForgotPinModal(true)} // 4. Tampilkan modal saat diklik
+              className="text-blue-500 hover:underline cursor-pointer"
+            >
+              Forgot PIN?
+            </button>
+          </div>
       </div>
     </div>
   );

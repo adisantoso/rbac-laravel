@@ -28,6 +28,12 @@ export default function MenuModal({ isOpen, onClose }) {
 
         {/* Row Modul */}
         <div className="flex flex-wrap gap-4 mb-4 justify-center">
+          <div className="border-gray-400 w-full" />
+          <Link href="/home" className="flex flex-col items-center space-y-2 min-w-[80px] px-2 py-2 bg-blue-600 rounded-2xl text-white cursor-pointer hover:bg-gray-400">
+              <HeroIcons.HomeIcon className="h-6 w-6" />
+          <label className='text-xs font-medium'>Home</label>
+          </Link>
+          
           {modules_acc.map((mod) => {
             const Icon = HeroIcons[mod.icon] || HeroIcons.ViewGridIcon;
             const isActive = activeModule === mod.id;
@@ -35,11 +41,11 @@ export default function MenuModal({ isOpen, onClose }) {
               <button
                 key={mod.id}
                 onClick={() => setActiveModule(isActive ? null : mod.id)}
-                className={`flex flex-col items-center space-y-2 min-w-[80px] px-2 py-2 bg-gray-600 rounded text-white cursor-pointer ${
+                className={`flex flex-col items-center space-y-2 min-w-[80px] px-2 py-2 bg-gray-600 rounded-2xl text-white cursor-pointer ${
                   isActive ? "bg-green-800 rounded-lg text-gray-600" : "hover:bg-gray-400 hover:text-white"
                 }`}
               >
-                <Icon className="h-5 w-5 text-gray-100" />
+                <Icon className="h-6 w-6 text-gray-100" />
                 <span className="text-xs font-medium">{mod.name}</span>
               </button>
             );
